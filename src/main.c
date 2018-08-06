@@ -149,7 +149,8 @@ int wmain(int argc, wchar_t *wargv[])
 #endif
 
     int dump         = 0;
-    int full_cleanup = 0;
+    /* TOOD - lets make this a compile-time option */
+    int full_cleanup = 1;
     int argi         = 1;
     int lib_path_i   = 0;
     int flag;
