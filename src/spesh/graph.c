@@ -1357,7 +1357,10 @@ void MVM_spesh_graph_destroy(MVMThreadContext *tc, MVMSpeshGraph *g) {
     /* Free handlers array, if different from the static frame. */
     if (!g->cand && g->handlers && g->handlers != g->sf->body.handlers)
         MVM_free(g->handlers);
-
+    if (!g->cand && g->deopt_addrs)
+        MVM_free(g->deopt_addrs);
+    if (!g->cand && g->inlines)
+        MVM_free(g->inlines);
     /* Free the graph itself. */
     MVM_free(g);
 }

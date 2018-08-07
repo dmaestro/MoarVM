@@ -146,6 +146,10 @@ void MVM_spesh_candidate_add(MVMThreadContext *tc, MVMSpeshPlanned *p) {
                 candidate->inlines[i].g = NULL;
             }
     }
+    /* Ownership of inlines and deopt_addrs has been assigned to the spesh
+     * candiate, so assign to NULL to prevent them from being freed */
+    sg->inlines = NULL;
+    sg->deopt_addrs = NULL;
     MVM_spesh_graph_destroy(tc, sg);
 
     /* Create a new candidate list and copy any existing ones. Free memory
@@ -203,4 +207,5 @@ void MVM_spesh_candidate_destroy(MVMThreadContext *tc, MVMSpeshCandidate *candid
     MVM_free(candidate->lexical_types);
     if (candidate->jitcode)
         MVM_jit_code_destroy(tc, candidate->jitcode);
+    MVM_free(candidate);
 }
