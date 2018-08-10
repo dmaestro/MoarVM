@@ -243,6 +243,20 @@ MVMSpeshGraph * MVM_spesh_inline_try_get_graph_from_unspecialized(MVMThreadConte
         return ig;
     }
     else {
+        /* TODO - we spent all this work creating an optimized version.  Maybe
+           we can make use of it by compiling a custom target despite not being
+           inlineable? */
+        int i;
+        /* During optimize, we may have inlined something, and we will need to
+         * clean their graphs up */
+        for (i = 0; i < ig->num_inlines; i++) {
+            if (ig->inlines[i].g) {
+                MVM_spesh_graph_destroy(tc, ig->inlines[i].g);
+                ig->inlines[i].g = NULL;
+            }
+        }
+        MVM_free(ig->local_types);
+        MVM_free(ig->lexical_types);
         MVM_free(ig->spesh_slots);
         MVM_spesh_graph_destroy(tc, ig);
         return NULL;

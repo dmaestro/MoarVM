@@ -1359,8 +1359,9 @@ void MVM_spesh_graph_destroy(MVMThreadContext *tc, MVMSpeshGraph *g) {
         MVM_free(g->handlers);
     if (!g->cand && g->deopt_addrs)
         MVM_free(g->deopt_addrs);
-    if (!g->cand && g->inlines)
+    if (!g->cand && g->inlines) {
         MVM_free(g->inlines);
+    }
     /* Free the graph itself. */
     MVM_free(g);
 }
