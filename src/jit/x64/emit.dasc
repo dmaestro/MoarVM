@@ -2107,7 +2107,7 @@ static void load_call_arg(MVMThreadContext *tc, MVMJitCompiler *compiler, MVMJit
             | cwde
         case 4:
             | cdqe
-            MVM_oops(tc, "JIT: Return value conversion attempted on STACK VALUE %lx", arg.v.lit_i64);
+        /*  MVM_oops(tc, "JIT: Return value conversion attempted on STACK VALUE %lx", arg.v.lit_i64); */
         }
         | mov TMP6, [rbp-(0x28+(arg.v.lit_i64 & 0xFFFF)*8)];
         break;
