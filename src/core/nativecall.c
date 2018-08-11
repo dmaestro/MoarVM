@@ -418,9 +418,6 @@ void init_box_call_node(MVMThreadContext *tc, MVMSpeshGraph *sg, MVMJitNode *box
     MVMJitCallArg args[] = { { MVM_JIT_INTERP_VAR , { MVM_JIT_INTERP_TC } },
                              { MVM_JIT_REG_DYNIDX, { 2 } },
                              { MVM_JIT_STACK_VALUE, { 0 } }};
-    init_c_call_node(tc, sg, box_rv_node, func_ptr, 3, args);
-    box_rv_node->next = NULL;
-
     if (ret_type == MVM_NATIVECALL_ARG_CHAR)
         args[2].v.lit_i64 |= sizeof(char) << 16;
     else if(ret_type == MVM_NATIVECALL_ARG_SHORT)
@@ -429,6 +426,9 @@ void init_box_call_node(MVMThreadContext *tc, MVMSpeshGraph *sg, MVMJitNode *box
         args[2].v.lit_i64 |= sizeof(int) << 16;
     else if (ret_type == MVM_NATIVECALL_ARG_LONG)
         args[2].v.lit_i64 |= sizeof(long) << 16;
+
+    init_c_call_node(tc, sg, box_rv_node, func_ptr, 3, args);
+    box_rv_node->next = NULL;
 
     if (dst == -1) {
         box_rv_node->u.call.rv_mode = MVM_JIT_RV_DYNIDX;
