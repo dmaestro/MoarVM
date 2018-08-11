@@ -2103,10 +2103,11 @@ static void load_call_arg(MVMThreadContext *tc, MVMJitCompiler *compiler, MVMJit
         case 1: /* no break as we need to do all of the following instructions */
             | cbw
         case 2:
+            MVM_oops(tc, "JIT: Return value conversion attempted - char / int16 not expected!");
             | cwde
         case 4:
             | cdqe
-            MVM_oops(tc, "JIT: Return value conversion attempted on STACK VALUE %d", arg.v.lit_i64);
+            MVM_oops(tc, "JIT: Return value conversion attempted on STACK VALUE %lx", arg.v.lit_i64);
         }
         | mov TMP6, [rbp-(0x28+(arg.v.lit_i64 & 0xFFFF)*8)];
         break;
