@@ -414,12 +414,22 @@ void save_rv_to_stack(MVMThreadContext *tc, MVMJitNode *node, MVMint32 storage_p
     node->u.call.rv_idx = storage_pos;
 }
 
-void init_box_call_node(MVMThreadContext *tc, MVMSpeshGraph *sg, MVMJitNode *box_rv_node, void *func_ptr, MVMint16 restype, MVMint16 dst) {
+void init_box_call_node(MVMThreadContext *tc, MVMSpeshGraph *sg, MVMJitNode *box_rv_node, void *func_ptr, MVMint16 restype, MVMint16 dst, MVMint16 ret_type) {
     MVMJitCallArg args[] = { { MVM_JIT_INTERP_VAR , { MVM_JIT_INTERP_TC } },
                              { MVM_JIT_REG_DYNIDX, { 2 } },
                              { MVM_JIT_STACK_VALUE, { 0 } }};
     init_c_call_node(tc, sg, box_rv_node, func_ptr, 3, args);
     box_rv_node->next = NULL;
+
+    if (ret_type == MVM_NATIVECALL_ARG_CHAR)
+        args[2].v.lit_i64 |= sizeof(char) << 16;
+    else if(ret_type == MVM_NATIVECALL_ARG_SHORT)
+        args[2].v.lit_i64 |= sizeof(short) << 16;
+    else if (ret_type == MVM_NATIVECALL_ARG_INT)
+        args[2].v.lit_i64 |= sizeof(int) << 16;
+    else if (ret_type == MVM_NATIVECALL_ARG_LONG)
+        args[2].v.lit_i64 |= sizeof(long) << 16;
+
     if (dst == -1) {
         box_rv_node->u.call.rv_mode = MVM_JIT_RV_DYNIDX;
         box_rv_node->u.call.rv_idx = 0;
@@ -556,10 +566,10 @@ MVMJitGraph *MVM_nativecall_jit_graph_for_caller_code(
         || body->ret_type == MVM_NATIVECALL_ARG_LONGLONG
         || body->ret_type == MVM_NATIVECALL_ARG_ULONGLONG
     ) {
-        init_box_call_node(tc, sg, box_rv_node, &MVM_nativecall_make_int, restype, dst);
+        init_box_call_node(tc, sg, box_rv_node, &MVM_nativecall_make_int, restype, dst, body->ret_type);
     }
     else if (body->ret_type == MVM_NATIVECALL_ARG_CPOINTER) {
-        init_box_call_node(tc, sg, box_rv_node, &MVM_nativecall_make_cpointer, restype, dst);
+        init_box_call_node(tc, sg, box_rv_node, &MVM_nativecall_make_cpointer, restype, dst, body->ret_type);
     }
     else if (body->ret_type == MVM_NATIVECALL_ARG_UTF8STR) {
         MVMJitCallArg args[] = { { MVM_JIT_INTERP_VAR , { MVM_JIT_INTERP_TC } },

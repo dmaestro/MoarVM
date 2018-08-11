@@ -2099,7 +2099,15 @@ static void load_call_arg(MVMThreadContext *tc, MVMJitCompiler *compiler, MVMJit
         | get_spesh_slot TMP6, arg.v.lit_i64;
         break;
     case MVM_JIT_STACK_VALUE:
-        | mov TMP6, [rbp-(0x28+arg.v.lit_i64*8)];
+        switch (arg.v.lit_i64 >> 16) {
+        case 1: /* no break as we need to do all of the following instructions */
+            | cbw
+        case 2:
+            | cwde
+        case 4:
+            | cdqe
+        }
+        | mov TMP6, [rbp-(0x28+(arg.v.lit_i64 & 0xFFFF)*8)];
         break;
     default:
         MVM_oops(tc, "JIT: Unknown JIT argument type %d", arg.type);
